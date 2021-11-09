@@ -2,7 +2,7 @@ import dash as ds
 from dash import dependencies
 import plotly.express as px
 import pandas as pd
-import Plotlyplot as pp
+import Data_processing as pp
 
 app = ds.Dash(__name__, title='Athlete Plot')
 
@@ -52,7 +52,7 @@ app.layout = ds.html.Div(children=[
     prevent_initial_call=True)
 
 #returns new figure depending on current state of the dropdown value
-#n_clicks a stand in for button clicked/ current_state is taken from the current value of the dropdown menu "graphstyle"
+#n_clicks is a stand in for button clicked/ current_state is taken from the current value of the dropdown menu "graphstyle"
 #update_figure is called on buttonpress, that may be obsolet but i did not find a way to stop it from triggering on every callback yet
 def update_figure(n_clicks, current_state):
     if(current_state == "lin"):
