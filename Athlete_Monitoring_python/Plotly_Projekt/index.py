@@ -1,3 +1,4 @@
+from os import path
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
@@ -13,7 +14,8 @@ app.layout= html.Div([
 @app.callback(Output('page-content', 'children'),
             Input('url', 'pathname'))
 def display_page(pathname):
-    if pathname == '/pages/Athlete_Monitoring':
+    print(pathname)
+    if pathname.startswith('/pages/Athlete_Monitoring'):
         return Athlete_Monitoring.layout
     if pathname == '/pages/data_choice':
         return data_choice.layout
@@ -22,4 +24,4 @@ def display_page(pathname):
     return '404'
 
 if __name__=='__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

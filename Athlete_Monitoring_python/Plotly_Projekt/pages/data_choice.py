@@ -1,6 +1,6 @@
+from threading import local
 import dash as ds
 from dash import dependencies
-import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output, State
@@ -16,7 +16,8 @@ layout = html.Div([
         options=[
             {'label': 'Local (.csv/.xls/...)', 'value': 'local'},
             {'label': 'Polar', 'value': 'polar'},
-           ] ,      
+        ],
+        value = "local"
     ),
     html.Div(id='choice-display-value',children=''),
 ])
