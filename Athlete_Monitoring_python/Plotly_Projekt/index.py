@@ -17,7 +17,7 @@ def display_page(pathname):
         return Athlete_Monitoring.layout
     if pathname == '/pages/data_choice':
         return data_choice.layout
-    if pathname =='/pages/local_data_frames':
+    if pathname =='/pages/localdata':
         return localdata.layout
     return '404'
 
