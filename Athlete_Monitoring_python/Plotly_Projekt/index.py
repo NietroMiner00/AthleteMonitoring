@@ -15,7 +15,7 @@ app.layout= html.Div([
             Input('url', 'pathname'))
 def display_page(pathname):
     print(pathname)
-    if pathname.startswith('/pages/Athlete_Monitoring'):
+    if pathname == '/pages/Athlete_Monitoring':
         return Athlete_Monitoring.layout
     if pathname == '/pages/data_choice':
         return data_choice.layout

@@ -119,12 +119,12 @@ def agg_func(df):
     return pd.Series(d)
 
 
-def process_data():
+def process_data(path):
     #Read csv file
     #df = pd.read_csv(file)
 
     #Read npy files
-    df_np = np.load("data/positions.npy", allow_pickle=True)
+    df_np = np.load(path, allow_pickle=True)
     df = pd.DataFrame({'Time':df_np[:, 0], 'playerID':df_np[:, 1], 'groupID':df_np[:, 2], 'X':df_np[:, 3], 'Y':df_np[:, 4]})
    
     #Time in dataframe
