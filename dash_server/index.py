@@ -4,7 +4,7 @@ from dash import html
 from dash.dependencies import Input, Output
 
 from app import app
-from pages import Athlete_Monitoring ,data_choice,localdata
+from pages import Athlete_Monitoring, data_choice, localdata, oauth2_callback
 
 app.layout= html.Div([
     dcc.Location(id='url', refresh=False),
@@ -21,6 +21,8 @@ def display_page(pathname):
         return data_choice.layout
     if pathname =='/pages/localdata':
         return localdata.layout
+    if pathname == '/oauth2_callback':
+        return oauth2_callback.layout
     return '404'
 
 if __name__=='__main__':

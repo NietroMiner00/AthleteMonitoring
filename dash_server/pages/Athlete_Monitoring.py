@@ -59,10 +59,10 @@ def update_figure(n_clicks, current_state, href):
 
     if(current_state == "lin"):
         #Linegraph
-        fig = px.line(df, x="Time", y="v", color="playerID")
+        fig = px.line(df, x="Time", y="speed", color="playerID")
         return fig
     if(current_state == "sca"):
         #Scattergraph
-        fig = px.scatter(df, x="Time", y="v", color="playerID")
+        fig = px.line(df, x="Time", y="v", color="playerID")
         return fig
     raise ds.exceptions.PreventUpdate
