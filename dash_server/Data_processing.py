@@ -127,6 +127,11 @@ def process_data(path):
     #df_np = np.load(path, allow_pickle=True)
     #df = pd.DataFrame({'Time':df_np[:, 0], 'playerID':df_np[:, 1], 'groupID':df_np[:, 2], 'X':df_np[:, 3], 'Y':df_np[:, 4]})
     df = pd.read_parquet(path)
+    df = df.rename(columns={"lat":"X", "lon":"Y", "time":"Time", "player_id": "playerID"})
+    df = df[df['X'].notna()]
+    df = df.reset_index()
+    df['groupID'] = 1
+    print(df)
    
     #Time in dataframe
     df['Time']= pd.to_datetime(df['Time'])
