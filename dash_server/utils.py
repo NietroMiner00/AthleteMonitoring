@@ -9,6 +9,7 @@ CONFIG_FILENAME = "config.yml"
 
 REDIRECT_URL = "http://localhost:{}{}".format(CALLBACK_PORT, CALLBACK_ENDPOINT)
 
+
 def load_config(filename):
     """Load configuration from a yaml file"""
     try:
@@ -33,8 +34,6 @@ def save_config(config, filename):
 
 def pretty_print_json(data):
     print(json.dumps(data, indent=4, sort_keys=True))
-
-
 
 config = load_config(CONFIG_FILENAME)
 

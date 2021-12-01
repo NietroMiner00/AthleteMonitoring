@@ -5,10 +5,7 @@ from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from requests.models import HTTPBasicAuth
-from utils import load_config, save_config, CONFIG_FILENAME, accesslink
-import requests
-from accesslink import AccessLink
+import utils
 
 from app import app
 from pages import localdata
@@ -44,18 +41,16 @@ def display_value(value):
         #Insert Polar integration here
         
 
-        config = load_config(CONFIG_FILENAME)
+        config = utils.load_config(utils.CONFIG_FILENAME)
         if config == None:
             return PreventUpdate
 
         if 'refresh_token' in config.keys() and config["refresh_token"] != "" and ('access_token' not in config.keys() or config["access_token"] == None):
-            access_token = requests.post(f"https://auth.polar.com/oauth/token?refresh_token={ config['refresh_token'] }&grant_type=refresh_token", auth=HTTPBasicAuth(config['client_id'], config['client_secret'])).json()['access_token']
-            config['access_token'] = access_token
-            save_config(config, "config.yml")
+            utils.accesslink.get_access_token()
             return dcc.Location(href="/pages/data_choice", id="someid_doesnt_matter")
 
-        index = accesslink.authorization_url.find('redirect_uri')
-        neuer_link = str(accesslink.authorization_url)[0:index]
+        index = utils.accesslink.authorization_url.find('redirect_uri')
+        neuer_link = str(utils.accesslink.authorization_url)[0:index]
         neuer_link = neuer_link + 'scope=team_read'
 
         return dcc.Location(href=neuer_link, id="someid_doesnt_matter")

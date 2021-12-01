@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 import glob
 import pandas as pd
 from urllib import parse
-from utils import accesslink, config, save_config, CONFIG_FILENAME
+import utils
 
 from app import app
 
@@ -25,11 +25,6 @@ def callback(href):
     query = parse.urlparse(href).query
     parameters = parse.parse_qs(query)
 
-    token_response = accesslink.get_access_token(parameters['code'][0])
+    utils.accesslink.get_access_token(refresh=False, authorization_code=parameters['code'][0])
 
-    #
-    # Save the user's id and access token to the configuration file.
-    #
-    config["refresh_token"] = token_response["refresh_token"]
-    config["access_token"] = token_response["access_token"]
-    save_config(config, CONFIG_FILENAME)
+    return dcc.Location(href="/pages/data_choice?data=polar", id="some-id")
