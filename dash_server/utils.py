@@ -36,8 +36,8 @@ def pretty_print_json(data):
     print(json.dumps(data, indent=4, sort_keys=True))
 
 config = load_config(CONFIG_FILENAME)
-if config == None:
-    print("Insert configuration into config.yml")
+if config == None or config['client_id'] == None or config['client_secret'] == None:
+    print("Insert clientID and secret into config.yml")
     exit()
 
 accesslink = AccessLink(client_id=config['client_id'],
