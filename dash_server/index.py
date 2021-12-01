@@ -23,7 +23,7 @@ def display_page(pathname):
         return localdata.layout
     if pathname == '/oauth2_callback':
         return oauth2_callback.layout
-    return '404'
+    return dcc.Location(href='/pages/data_choice', id='page-content')
 
 if __name__=='__main__':
     app.run_server(debug=True)

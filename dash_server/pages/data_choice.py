@@ -6,6 +6,7 @@ from dash import dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import utils
+import requests
 
 from app import app
 from pages import localdata
@@ -21,8 +22,9 @@ layout = html.Div([
         ],
         value = "local"
     ),
-    html.Div(id='choice-display-value',children=''),
-])
+    html.Div(
+        id='choice-display-value', children='')
+    ])
 
 #Callback for data_dropdown which changes page layout depending on dropdown value
 #Writes new layout in choice-display-value children
@@ -30,17 +32,20 @@ layout = html.Div([
     Output('choice-display-value', 'children'),
     Input('data_dropdown', 'value'))
 def display_value(value):
-    print(value)
     #load localdata layout
     if (value == 'local'):
-        print(value)
         return localdata.layout
     
     #load polar layout
     if (value == 'polar'):
-        #Insert Polar integration here
         logged_in = utils.accesslink.logged_in()
         if logged_in[0]:
-            pass
+            #Fetch team and return dropdown with chooseable team
+            config = utils.load_config("config.yml")
+            headers = {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + config['access_token']}
+            teams = requests.get('https://teampro.api.polar.com/v1/teams/', params={}, headers=headers).json()['data']
+            return html.Div([dcc.Dropdown(id='polar-drop',options=[{'label': team.get('name'),'value': team.get('id')} for team in teams])])
         else:
             return logged_in[1]
