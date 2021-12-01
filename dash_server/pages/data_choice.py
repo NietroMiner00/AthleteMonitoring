@@ -39,19 +39,8 @@ def display_value(value):
     #load polar layout
     if (value == 'polar'):
         #Insert Polar integration here
-        
-
-        config = utils.load_config(utils.CONFIG_FILENAME)
-        if config == None:
-            return PreventUpdate
-
-        if 'refresh_token' in config.keys() and config["refresh_token"] != "" and ('access_token' not in config.keys() or config["access_token"] == None):
-            utils.accesslink.get_access_token()
-            return dcc.Location(href="/pages/data_choice", id="someid_doesnt_matter")
-
-        index = utils.accesslink.authorization_url.find('redirect_uri')
-        neuer_link = str(utils.accesslink.authorization_url)[0:index]
-        neuer_link = neuer_link + 'scope=team_read'
-
-        return dcc.Location(href=neuer_link, id="someid_doesnt_matter")
-    
+        logged_in = utils.accesslink.logged_in()
+        if logged_in[0]:
+            pass
+        else:
+            return logged_in[1]
