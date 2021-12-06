@@ -20,7 +20,7 @@ REDIRECT_URL = "http://localhost:{}{}".format(CALLBACK_PORT, CALLBACK_ENDPOINT)
 
 config = load_config(CONFIG_FILENAME)
 
-if 'refresh_token' in config.keys():
+if 'refresh_token' in config.keys() and config['refresh_token'] != None:
     access_token = requests.post(f"https://auth.polar.com/oauth/token?refresh_token={ config['refresh_token'] }&grant_type=refresh_token", auth=HTTPBasicAuth(config['client_id'], config['client_secret'])).json()['access_token']
     config['access_token'] = access_token
     save_config(config, "config.yml")
