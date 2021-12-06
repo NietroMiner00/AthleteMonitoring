@@ -11,7 +11,7 @@ from accesslink import AccessLink
 from accesslink.oauth2 import OAuth2Client
 
 
-CALLBACK_PORT = 5000
+CALLBACK_PORT = 8050
 CALLBACK_ENDPOINT = "/oauth2_callback"
 
 CONFIG_FILENAME = "config.yml"
