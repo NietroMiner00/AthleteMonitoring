@@ -23,11 +23,11 @@ class API:
         else: self.refresh_token = None
 
     def error_handling(func):
-        def wrapper(self):
+        def wrapper(self, *args):
             for i in range(0,5):
                 data = {}
                 if self.headers != None:
-                    data = func(self).json()
+                    data = func(self, args).json()
                 if('data' not in data.keys()):
                     result = utils.accesslink.new_access_token()
                     if not result[0]:
@@ -38,6 +38,13 @@ class API:
         return wrapper
     
     @error_handling
-    def get_teams(self):
+    def get_teams(self, args):
         data = requests.get('https://teampro.api.polar.com/v1/teams/', params={}, headers=self.headers)
+        return data
+
+    @error_handling   
+    def get_sessions(self, args):
+        data = requests.get(f'https://teampro.api.polar.com/v1/teams/{args[0]}/training_sessions/', params={}, headers=self.headers)          
+        print(f'{data.content}')
+        print(f'https://teampro.api.polar.com/v1/teams/{args[0]}/training_sessions/')
         return data

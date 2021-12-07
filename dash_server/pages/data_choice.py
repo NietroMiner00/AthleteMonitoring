@@ -44,6 +44,27 @@ def display_value(value):
             teams = utils.api.get_teams()
             if type(teams) == dcc.Location:
                 return teams # Redirect if no refresh_token
-            return html.Div([dcc.Dropdown(id='polar-drop',options=[{'label': team.get('name'),'value': team.get('id')} for team in teams])])
+            return html.Div([dcc.Dropdown(id='polar-drop',options=[{'label': team['name'],'value': team['id']} for team in teams]), html.Div(id="sessions")],id='drop_div')
         else:
             return logged_in[1]
+
+@app.callback(
+    Output('sessions', 'children'),
+    Input('polar-drop', 'value'))
+def show_team_details(team):
+    print(team)
+    if team == None:
+        raise PreventUpdate
+    sessions = utils.api.get_sessions(team)
+    session_collection= []
+    for amount, session in enumerate(sessions):
+        date = session['created']
+        starttime = session['start_time']
+        endtime = session['end_time']
+        new_session= html.Div([
+            html.H5(f'Session: {amount}'),
+            html.P(f'Datum: {date}, Starttime: {starttime}, Endtime: {endtime}'),
+            html.Button('Download', id=f'button_load_session{amount}', n_clicks=0)
+        ])
+        session_collection.append(new_session)
+    return session_collection
