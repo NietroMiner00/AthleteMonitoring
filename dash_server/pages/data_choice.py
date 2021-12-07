@@ -41,11 +41,9 @@ def display_value(value):
         logged_in = utils.accesslink.logged_in()
         if logged_in[0]:
             #Fetch team and return dropdown with chooseable team
-            config = utils.load_config("config.yml")
-            headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + config['access_token']}
-            teams = requests.get('https://teampro.api.polar.com/v1/teams/', params={}, headers=headers).json()['data']
+            teams = utils.api.get_teams()
+            if type(teams) == dcc.Location:
+                return teams # Redirect if no refresh_token
             return html.Div([dcc.Dropdown(id='polar-drop',options=[{'label': team.get('name'),'value': team.get('id')} for team in teams])])
         else:
             return logged_in[1]

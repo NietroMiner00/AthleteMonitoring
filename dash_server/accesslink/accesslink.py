@@ -77,3 +77,7 @@ class AccessLink(object):
 
                 return False, dcc.Location(href=neuer_link, id="someid_doesnt_matter")
         else: return True, None
+
+    def new_access_token(self):
+        utils.config['access_token'] = None
+        return self.logged_in()

@@ -1,6 +1,7 @@
 import json
 import yaml
 from accesslink import AccessLink
+from API import API
 
 CALLBACK_PORT = 5000
 CALLBACK_ENDPOINT = "/oauth2_callback"
@@ -43,3 +44,5 @@ if config == None or config['client_id'] == None or config['client_secret'] == N
 accesslink = AccessLink(client_id=config['client_id'],
                         client_secret=config['client_secret'],
                         redirect_url=REDIRECT_URL)
+
+api = API()
