@@ -19,7 +19,7 @@ layout = html.Div([
      html.Div(id="hidden_div_for_redirect_callback")
 ])
 
-
+#dynamically assigns dropdown options for "local_dropdown" in form of file names
 @app.callback(Output('local_dropdown','options'),
             Input('data_dropdown','value'))
 def data_display(value):
@@ -31,6 +31,7 @@ def data_display(value):
         return [{"label": file.replace("data\\", ""), "value": file} for file in files_grabbed]
     raise PreventUpdate
 
+#loads Athlete_Monitoring page when file is choosen, includes filename in url
 @app.callback(Output("hidden_div_for_redirect_callback", "children"),
                 Input("local_dropdown", "value"))
 def read_selected_file(value):
