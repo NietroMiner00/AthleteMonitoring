@@ -3,10 +3,11 @@ import dash as ds
 from dash import dependencies
 from dash import html
 from dash import dcc
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import utils
 import requests
+import os
 
 from app import app
 from pages import localdata
@@ -52,7 +53,6 @@ def display_value(value):
     Output('sessions', 'children'),
     Input('polar-drop', 'value'))
 def show_team_details(team):
-    print(team)
     if team == None:
         raise PreventUpdate
     sessions = utils.api.get_sessions(team)
@@ -64,7 +64,40 @@ def show_team_details(team):
         new_session= html.Div([
             html.H5(f'Session: {amount}'),
             html.P(f'Datum: {date}, Starttime: {starttime}, Endtime: {endtime}'),
-            html.Button('Download', id=f'button_load_session{amount}', n_clicks=0)
+            html.Button('Download', id={'type':'button_load_session', 'index':amount}, n_clicks=0)
         ])
         session_collection.append(new_session)
+
     return session_collection
+
+@app.callback(
+    Output({'type':'button_load_session', 'index':ALL}, "n_clicks"),
+    Input({'type':'button_load_session', 'index':ALL}, 'n_clicks'),
+    State('polar-drop', 'value')
+)
+def on_load_session(n_clicks, team_id):
+    for i in range(len(n_clicks)):
+        if n_clicks[i]:
+            teams = utils.api.get_teams()
+
+            team_name = None
+            for team in teams:
+                if team['id'] == team_id:
+                    team_name = team['name']
+            if team_name == None:
+                raise Exception("Something went horribly wrong!!!")
+
+            sessions = utils.api.get_sessions(team_id)
+            session = sessions[i]
+            session_id = session['id']
+
+            participants_data = utils.api.get_participants_data(session_id)
+
+            session_path = f"data\{team_name}"
+            if not os.path.exists(session_path):
+                os.mkdir(session_path)
+            participants_data.to_parquet(session_path + f"\{session['start_time'].replace(':', '-')}-{session_id}.parquet")
+
+            break
+        n_clicks[i] = 0
+    return n_clicks

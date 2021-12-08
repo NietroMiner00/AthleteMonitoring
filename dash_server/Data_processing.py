@@ -131,7 +131,6 @@ def process_data(path):
     df = df[df['X'].notna()]
     df = df.reset_index()
     df['groupID'] = 1
-    print(df)
    
     #Time in dataframe
     df['Time']= pd.to_datetime(df['Time'])

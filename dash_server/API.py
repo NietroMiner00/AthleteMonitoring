@@ -1,5 +1,7 @@
 import utils
 import requests
+import pandas
+import numpy as np
 
 class API:
     def __init__(self):
@@ -44,7 +46,44 @@ class API:
 
     @error_handling   
     def get_sessions(self, args):
-        data = requests.get(f'https://teampro.api.polar.com/v1/teams/{args[0]}/training_sessions/', params={}, headers=self.headers)          
-        print(f'{data.content}')
-        print(f'https://teampro.api.polar.com/v1/teams/{args[0]}/training_sessions/')
+        data = requests.get(f'https://teampro.api.polar.com/v1/teams/{args[0]}/training_sessions/', params={}, headers=self.headers)
         return data
+
+    @error_handling
+    def get_session(self, args):
+        details = requests.get(f'https://teampro.api.polar.com/v1/teams/training_sessions/{args[0]}', params={}, headers = self.headers)
+        return details
+
+    @error_handling
+    def get_participant_data(self, args):
+        return requests.get(f'https://teampro.api.polar.com/v1/training_sessions/{args[0]}/?samples=all', params={}, headers=self.headers)
+
+    def get_participants_data(self, session_id):
+        session = self.get_session(session_id)
+
+        participants = session['participants']
+
+        all_player_data = pandas.DataFrame()
+        for player in participants:
+            player_session_id = player['player_session_id']
+            
+            player_session_details = self.get_participant_data(player_session_id)
+
+            player_raw_data = player_session_details['samples']['values']
+            player_columns = player_session_details['samples']['fields']
+
+            player_table = pandas.DataFrame(player_raw_data, columns=player_columns)
+            player_table['player_id'] = player['player_id']
+
+            start_time = player_session_details['start_time']
+
+            dates = pandas.date_range(start_time, periods=len(player_raw_data), freq="100ms")
+
+            player_table['time'] = dates
+
+            all_player_data = all_player_data.append(player_table)
+
+        all_player_data = all_player_data.reset_index()
+        all_player_data = all_player_data.replace("NaN", np.nan)
+
+        return all_player_data
