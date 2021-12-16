@@ -7,6 +7,25 @@ from datetime import datetime
 from pylab import rcParams      # change figure size
 #rcParams['figure.figsize'] = 18, 8
 
+# vectorized haversine function
+def haversine(lat1, lon1, lat2, lon2, to_radians=True, earth_radius=6371):
+    """
+    slightly modified version: of http://stackoverflow.com/a/29546836/2901002
+
+    Calculate the great circle distance between two points
+    on the earth (specified in decimal degrees or in radians)
+
+    All (lat, lon) coordinates must have numeric dtypes and be of equal length.
+
+    """
+    if to_radians:
+        lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+
+    a = np.sin((lat2-lat1)/2.0)**2 + \
+        np.cos(lat1) * np.cos(lat2) * np.sin((lon2-lon1)/2.0)**2
+
+    return earth_radius * 2 * np.arcsin(np.sqrt(a))
+
 # Low Pass Filter
 def bw_filt(vec, fc, fs, order):     
     Wn = fc/(fs/2)
@@ -38,9 +57,14 @@ def get_cols(df):
         df['tmin'] = 1/fs/60
 
         #Distance
-        x_value=df.X.astype(np.float32)
-        y_value=df.Y.astype(np.float32)
-        df['ds'] = np.sqrt(x_value.diff()**2 + y_value.diff()**2)
+        lon=df.lon.astype(np.float32)
+        lat=df.lat.astype(np.float32)
+
+        # Conversion from GPS to m
+        df['ds'] = haversine(lat.shift(), lon.shift(), df.loc[1:, 'lat'], df.loc[1:, 'lon']) * 1000
+
+        # uneccassary for gps data
+        #df['ds'] = np.sqrt(lon.diff()**2 + lat.diff()**2)
 
         #Velocity
         df['v'] = df.ds/df.dt
@@ -127,8 +151,9 @@ def process_data(path):
     #df_np = np.load(path, allow_pickle=True)
     #df = pd.DataFrame({'Time':df_np[:, 0], 'playerID':df_np[:, 1], 'groupID':df_np[:, 2], 'X':df_np[:, 3], 'Y':df_np[:, 4]})
     df = pd.read_parquet(path)
-    df = df.rename(columns={"lat":"X", "lon":"Y", "time":"Time", "player_id": "playerID"})
-    df = df[df['X'].notna()]
+    df = df.rename(columns={"time":"Time", "player_id": "playerID"})
+    df = df[df['lat'].notna()]
+    df['speed'] = df['speed'] / 3.6
     df = df.reset_index()
     df['groupID'] = 1
    

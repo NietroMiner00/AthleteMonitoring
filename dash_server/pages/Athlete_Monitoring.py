@@ -23,10 +23,10 @@ layout = html.Div(children=[
                     dcc.Dropdown(
                         id='graphstyle',
                         options=[
-                            {'label': 'Line', 'value': 'lin'},
-                            {'label': 'Scatter', 'value': 'sca'}
+                            {'label': 'Data from API', 'value': 'lin'},
+                            {'label': 'Data from GPS', 'value': 'sca'}
                         ],
-                        value='lin'
+                        value='sca'
                     ),
                     html.Div(id='gs_output_container'),
                 ]),
