@@ -3,6 +3,7 @@ from dash.exceptions import PreventUpdate
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output, State
+import utils
 import glob
 import pandas as pd
 
@@ -10,30 +11,38 @@ from app import app
 
 layout = html.Div([
     html.Div([
-        html.H2('Data needs to be stored in: Athlete_Monitoring_python\Plotly_Projekt\Data'),
+        html.H2(
+            'Data needs to be stored in: Athlete_Monitoring\dash_server\data'),
         dcc.Dropdown(
             id='local_dropdown'
         ),
     ]),
-     html.Div(id='data_display', children=''),
-     html.Div(id="hidden_div_for_redirect_callback")
+    html.Div(id='data_display', children=''),
+    html.Div(id="hidden_div_for_redirect_callback")
 ])
 
-#dynamically assigns dropdown options for "local_dropdown" in form of file names
-@app.callback(Output('local_dropdown','options'),
-            Input('data_dropdown','value'))
+# dynamically assigns dropdown options for "local_dropdown" in form of file names
+@app.callback(Output('local_dropdown', 'options'),
+              Input('data_dropdown', 'value'))
 def data_display(value):
     if value == "local":
-        types = ("data/*.parquet", "data/*.csv", "data/*.xls", "data/*.fea", "data/*.npy", "data/*.json")
+        teams = utils.api.get_teams()
+        team_name = None
         files_grabbed = []
-        for files in types:
-            files_grabbed.extend(glob.glob(files))
-        return [{"label": file.replace("data\\", ""), "value": file} for file in files_grabbed]
+        for i, name in enumerate(teams):
+            team_name = name["name"]
+            types = (f"dash_server/data/{team_name}/*.parquet", f"dash_server/data/{team_name}/*.csv", f"dash_server/data/{team_name}/*.xls",
+                     f"dash_server/data/{team_name}/*.fea", f"dash_server/data/{team_name}/*.npy", f"dash_server/data/{team_name}/*.json")
+            for files in types:
+                files_grabbed.extend(glob.glob(files))
+        return [{"label": file.replace("dash_server/data/", ""), "value": file} for file in files_grabbed]
     raise PreventUpdate
 
-#loads Athlete_Monitoring page when file is choosen, includes filename in url
+# loads Athlete_Monitoring page when file is choosen, includes filename in url
+
+
 @app.callback(Output("hidden_div_for_redirect_callback", "children"),
-                Input("local_dropdown", "value"))
+              Input("local_dropdown", "value"))
 def read_selected_file(value):
     if value == None:
         raise PreventUpdate
