@@ -15,6 +15,10 @@ import pages.Athlete_Monitoring as am
 from app import app
 
 layout = html.Div([
+    html.H1("Speedzones:"),
+    html.Label("Seperate speedzones by ',':"),
+    html.Br(),
+    dcc.Input(id="speedzone-input", value="0,5,15,20,30"),
     dcc.Graph(
         id='speedzones-graph'
     ),
@@ -23,23 +27,39 @@ layout = html.Div([
 
 @ app.callback(
     Output("speedzones-graph", "figure"),
-    Input("gen_speedzones", "n_clicks"))
-def update_figure(n_clicks):
+    Input("gen_speedzones", "n_clicks"),
+    State("speedzone-input", "value"))
+def update_figure(n_clicks, speedzone_input):
     df = am.df
 
-    zones = [5, 12, 20, 25, 30]
+    zones = []
+    temp_speedzones = speedzone_input.split(',')
+    for zone in temp_speedzones:
+        zones.append(float(zone.strip()))
+
     if "speed" not in df:
         raise PreventUpdate
 
     total = df.groupby('playerID').speed.count()
-    speedzone1 = df[(df['speed'] >= 0) & (df['speed'] < zones[0])].groupby('playerID').speed.count() / total
-    speedzone2 = df[(df['speed'] >= zones[0]) & (df['speed'] < zones[1])].groupby('playerID').speed.count() / total
-    speedzone3 = df[(df['speed'] >= zones[1]) & (df['speed'] < zones[2])].groupby('playerID').speed.count() / total
-    speedzone4 = df[(df['speed'] >= zones[2]) & (df['speed'] < zones[3])].groupby('playerID').speed.count() / total
-    speedzone5 = df[(df['speed'] >= zones[3]) & (df['speed'] < zones[4])].groupby('playerID').speed.count() / total
-    speedzone6 = df[(df['speed'] >= zones[4]) & (df['speed'] < np.inf)].groupby('playerID').speed.count() / total
+    speedzones = []
+    for index, zone  in enumerate(zones):
+        if index < len(zones)-1:
+            speedzones.append(
+                df[
+                    (df['speed'] >= zones[index]) & (df['speed'] < zones[index+1])
+                ].groupby('playerID')
+                .speed
+                .count() / total
+            )
+        else:
+            speedzones.append(
+                df[
+                    (df['speed'] >= zones[index]) & (df['speed'] < np.inf)
+                ].groupby('playerID')
+                .speed
+                .count() / total
+            )
 
-    speedzones = pd.DataFrame([speedzone1.array, speedzone2.array, speedzone3.array, speedzone4.array, speedzone5.array, speedzone6.array, ], columns=speedzone1.index.array)
-    print(speedzones)
+    speedzones = pd.DataFrame([speedzone.array for speedzone in speedzones], columns=speedzones[0].index.array)
     fig = px.bar(speedzones)
     return fig

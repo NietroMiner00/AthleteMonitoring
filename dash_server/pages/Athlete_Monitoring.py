@@ -27,7 +27,7 @@ layout = html.Div(children=[
                             {'label': 'Data from API', 'value': 'lin'},
                             {'label': 'Data from GPS', 'value': 'sca'}
                         ],
-                        value='sca'
+                        value='lin'
                     ),
                     html.Div(id='gs_output_container'),
                 ]),
@@ -53,6 +53,7 @@ layout = html.Div(children=[
 #update_figure is called on buttonpress, that may be obsolet but i did not find a way to stop it from triggering on every callback yet
 def update_figure(n_clicks, current_state, href):
     global df
+    df = DataFrame()
 
     query = parse.urlparse(href).query
     parameters = parse.parse_qs(query)
@@ -61,7 +62,10 @@ def update_figure(n_clicks, current_state, href):
 
     if(current_state == "lin"):
         #Linegraph
-        fig = px.line(df, x="Time", y="speed", color="playerID")
+        fig = px.line(df, x="Time", y="speed", color="playerID",
+        title="Speed in relation to time",
+        labels={"Time": "Session Time" , "speed" : "Achived Speed", "playerID": "Player"},
+        template="plotly_dark")
         return fig
     if(current_state == "sca"):
         #Scattergraph

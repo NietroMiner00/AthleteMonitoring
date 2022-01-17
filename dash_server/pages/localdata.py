@@ -31,11 +31,11 @@ def data_display(value):
         files_grabbed = []
         for i, name in enumerate(teams):
             team_name = name["name"]
-            types = (f"dash_server/data/{team_name}/*.parquet", f"dash_server/data/{team_name}/*.csv", f"dash_server/data/{team_name}/*.xls",
-                     f"dash_server/data/{team_name}/*.fea", f"dash_server/data/{team_name}/*.npy", f"dash_server/data/{team_name}/*.json")
+            types = (f"data/{team_name}/*.parquet", f"data/{team_name}/*.csv", f"data/{team_name}/*.xls",
+                     f"data/{team_name}/*.fea", f"data/{team_name}/*.npy", f"data/{team_name}/*.json")
             for files in types:
                 files_grabbed.extend(glob.glob(files))
-        return [{"label": file.replace("dash_server/data/", ""), "value": file} for file in files_grabbed]
+        return [{"label": file.replace("data/", ""), "value": file} for file in files_grabbed]
     raise PreventUpdate
 
 # loads Athlete_Monitoring page when file is choosen, includes filename in url

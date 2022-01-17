@@ -3,7 +3,6 @@ import dash as ds
 from dash import dependencies,html,dcc,callback_context
 from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
-import dash_bootstrap_components as dbc
 import utils
 import requests
 import os
@@ -170,7 +169,7 @@ def downloadqueue_callback(n_clicks, team_id):
         ###
 
         participants_data = utils.api.get_participants_data(session_id)
-        session_path = f"dash_server/data/{team_name}"
+        session_path = f"data/{team_name}"
         if not os.path.exists(session_path):
             os.makedirs(session_path)
         participants_data.to_parquet(session_path + f"/{session_id}.parquet")
