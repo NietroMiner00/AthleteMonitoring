@@ -67,7 +67,7 @@ def get_cols(df):
         #df['ds'] = np.sqrt(lon.diff()**2 + lat.diff()**2)
 
         #Velocity
-        df['v'] = df.ds/df.dt
+        df['v'] = (df.ds/df.dt) * 3.6
 
         #Removes missing Data from subset v
         df = df.dropna(subset=['v'])
@@ -153,7 +153,7 @@ def process_data(path):
     df = pd.read_parquet(path)
     df = df.rename(columns={"time":"Time", "player_id": "playerID"})
     df = df[df['lat'].notna()]
-    df['speed'] = df['speed'] / 3.6
+    df['speed'] = df['speed']
     df = df.reset_index()
     df['groupID'] = 1
    

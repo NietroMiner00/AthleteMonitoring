@@ -8,6 +8,7 @@ import Data_processing as pp
 from dash import html 
 from dash import dcc
 from urllib import parse
+import pages.speedzones_page as sp
 
 from app import app
 
@@ -36,7 +37,8 @@ layout = html.Div(children=[
     #draws Graphs
     dcc.Graph(
         id='example-graph'
-    )
+    ),
+    sp.layout
 ])
 
 #Callback to dynamically change figure based on current selected dropdown option via button input.
