@@ -9,6 +9,8 @@ from dash import html
 from dash import dcc
 from urllib import parse
 import pages.speedzones_page as sp
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from app import app
 
@@ -24,10 +26,10 @@ layout = html.Div(children=[
                     dcc.Dropdown(
                         id='graphstyle',
                         options=[
-                            {'label': 'Data from API', 'value': 'lin'},
-                            {'label': 'Data from GPS', 'value': 'sca'}
+                            {'label': 'All Player Speed x Time', 'value': 'lin'},
+                            {'label': 'One Player Speed x Time + HR', 'value': 'sca'}
                         ],
-                        value='lin'
+                        value='sca'
                     ),
                     html.Div(id='gs_output_container'),
                 ]),
@@ -63,12 +65,42 @@ def update_figure(n_clicks, current_state, href):
     if(current_state == "lin"):
         #Linegraph
         fig = px.line(df, x="Time", y="speed", color="playerID",
-        title="Speed in relation to time",
-        labels={"Time": "Session Time" , "speed" : "Achived Speed", "playerID": "Player"},
-        template="plotly_dark")
+            title="Speed in relation to time",
+            labels={"Time": "Session Time" , "speed" : "Achived Speed", "playerID": "Player"},
+            template="plotly_dark"
+        )
+
+        # Create figure with secondary y-axis
+        
+
         return fig
     if(current_state == "sca"):
         #Scattergraph
-        fig = px.line(df, x="Time", y="v", color="playerID")
+        #fig = px.line(df, x="Time", y="v", color="playerID")
+
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        # Add traces
+        fig.add_trace(
+            go.Scatter(x=df['Time'][df['playerID'] == "BO5e35el"], y=df['speed'][df['playerID'] == "BO5e35el"], name="Speed"),
+            secondary_y=False,
+        )
+
+        fig.add_trace(
+            go.Scatter(x=df['Time'][df['playerID'] == "BO5e35el"], y=df['hr'][df['playerID'] == "BO5e35el"], name="Heart Rate"),
+            secondary_y=True,
+        )
+
+        # Set x-axis title
+        fig.update_xaxes(title_text="Session Time")
+
+        # Set y-axes titles
+        fig.update_yaxes(
+            title_text="<b>Achieved</b> Speed",
+            secondary_y=False)
+        fig.update_yaxes(
+            title_text="<b>Current</b> Heart Rate", 
+            secondary_y=True)
+
         return fig
     raise ds.exceptions.PreventUpdate
