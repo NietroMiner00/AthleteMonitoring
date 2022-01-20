@@ -1,0 +1,5 @@
+html *:not(#example-graph *, #speedzones-graph *){
+    font-family: Arial !important;
+    background-color: #121212 ;
+    color: white ;
+   }

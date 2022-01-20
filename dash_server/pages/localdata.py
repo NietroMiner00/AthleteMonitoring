@@ -10,9 +10,9 @@ import pandas as pd
 from app import app
 
 layout = html.Div([
-    html.Div([
-        html.H2(
-            'Data needs to be stored in: Athlete_Monitoring\dash_server\data'),
+    html.Div(id="first_dropdown",children=[ 
+        html.H3('Please choose a file:'),
+        html.H3('Files nees to be stored in: Athlete_Monitoring\dash_server\data'),
         dcc.Dropdown(
             id='local_dropdown'
         ),

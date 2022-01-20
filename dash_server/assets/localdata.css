@@ -1,0 +1,4 @@
+#first_dropdown #local_dropdown .VirtualizedSelectFocusedOption {
+    background-color: yellow;
+    color: black;
+}

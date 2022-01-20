@@ -1,4 +1,5 @@
 from inspect import Parameter
+from re import template
 import dash as ds
 from dash.dependencies import Output, Input, State
 from pandas.core.frame import DataFrame
@@ -19,8 +20,7 @@ df = DataFrame()
 #Layout construction similar to html syntax
 #Current layout is neither optimised nor especially beautiful so feel free to adjust divs  
 layout = html.Div(children=[
-    html.H1(children='Athlete Monitoring: Example',
-               style={'textAlign': 'center'},),
+    html.H1(children='Athlete Monitoring: Example'),
     html.Div([
                 html.Div([
                     dcc.Dropdown(
@@ -29,7 +29,7 @@ layout = html.Div(children=[
                             {'label': 'All Player Speed x Time', 'value': 'lin'},
                             {'label': 'One Player Speed x Time + HR', 'value': 'sca'}
                         ],
-                        value='sca'
+                        value='lin'
                     ),
                     html.Div(id='gs_output_container'),
                 ]),
@@ -38,7 +38,8 @@ layout = html.Div(children=[
                 ]),
     #draws Graphs
     dcc.Graph(
-        id='example-graph'
+        id='example-graph',
+        
     ),
     sp.layout
 ])
@@ -101,6 +102,10 @@ def update_figure(n_clicks, current_state, href):
         fig.update_yaxes(
             title_text="<b>Current</b> Heart Rate", 
             secondary_y=True)
+
+        fig.update_layout(template="plotly_dark")
+
+        
 
         return fig
     raise ds.exceptions.PreventUpdate

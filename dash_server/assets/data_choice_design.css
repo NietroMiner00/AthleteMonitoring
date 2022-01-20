@@ -1,0 +1,91 @@
+#header_data_choice H1{
+    background-color: yellow !important;
+    color: black !important;
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-left: 0cm;
+    padding-top: 1cm;
+    padding-bottom: 1cm;
+    text-align: left;
+}
+
+#data_dropdown {
+    color: white;
+    margin-right: 40%;
+}
+
+#data_dropdown .VirtualizedSelectFocusedOption{
+    background-color: yellow;
+    color: black;
+}
+
+/*Here begins the Polar part*/
+#polar-drop{
+    margin-right: 30%;
+}
+#polar-drop .VirtualizedSelectFocusedOption{
+    background-color: yellow;
+    color:black;
+}
+
+#sessions #session_div{
+    background-color: yellow;
+    color: black;
+    border-radius: 25px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5%;
+    margin-right: 70%;
+}
+#sessions #session_div h4{
+    background-color: unset;
+    padding-top: 10px;
+    color: black;
+}
+
+#sessions #session_div p{
+    color: black;
+    background-color: yellow;
+}
+
+#sessions #session_header h3{
+    background-color: #121212;
+    color: white;
+    margin-right:30%;
+    
+
+}
+#sessions button{
+    box-shadow: 3px 4px 0px 0px #d1ce00;
+	background-color:#000000;
+	border-radius:15px;
+	border:1px solid #e5f771;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:8px;
+	padding:7px 20px;
+    margin-bottom: 15px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #e1e2ed;
+}
+#sessions button:hover{
+    background-color:#000000;
+}
+#sessions button:active{
+    position:relative;
+	top:1px;
+}
+
+#sessions .queue{
+    margin-right: 10% !important;
+    margin-left: 60%;
+    background-color: yellow !important;
+    position:fixed;
+    top: 50%;
+}
+#sessions .queue #downqueue{
+    background-color: yellow;
+
+}

@@ -13,19 +13,24 @@ from app import app
 from pages import localdata
 queue = []
 
-layout = html.Div([
-    html.H3('Datatype'),
-    # Dropdown with either Local or Polar option
-    dcc.Dropdown(
-        id='data_dropdown',
-        options=[
-            {'label': 'Local (.csv/.xls/...)', 'value': 'local'},
-            {'label': 'Polar', 'value': 'polar'},
-        ],
-        value="local"
-    ),
-    html.Div(
-        id='choice-display-value', children='')
+layout = html.Div(children=[
+    html.Div(id="header_data_choice",children=[
+        html.H1("Athlete Monitoring APP")
+
+    ]),
+    html.Div(id="data_selection_first_page",children=[
+        html.H2('Do you already have data available?: '),
+        # Dropdown with either Local or Polar option
+        dcc.Dropdown(
+            id='data_dropdown',
+            options=[
+                {'label': 'Yes, local .csv/.xls/... files', 'value': 'local'},
+                {'label': 'No, i need to access Polar', 'value': 'polar'},
+            ],
+            
+        ),
+        html.Div(
+            id='choice-display-value', children='')])
 ])
 
 # Callback for data_dropdown which changes page layout depending on dropdown value
@@ -46,13 +51,11 @@ def display_value(value):
             teams = utils.api.get_teams()
             if type(teams) == dcc.Location:
                 return teams  # Redirect if no refresh_token
-            return html.Div([dcc.Dropdown(id='polar-drop', options=[{'label': team['name'], 'value': team['id']} for team in teams]), html.Div(id="sessions"), html.Div(id="downqueue")], id='drop_div')
+            return html.Div(children=[html.H3("Please select your team:"),dcc.Dropdown(id='polar-drop', options=[{'label': team['name'], 'value': team['id']} for team in teams]), html.Div(id="sessions"), html.Div(id="downqueue")], id='drop_div')
         else:
             return logged_in[1]
 
 # callback for displaying sessions of, in "polar-drop", choosen team
-
-
 @app.callback(
     Output('sessions', 'children'),
     Input('polar-drop', 'value'))
@@ -65,7 +68,8 @@ def show_team_details(team):
 
     # array of new divs we want to add
     session_collection = []
-
+    session_head= html.Div(id="session_header",children=[html.H3("The following sessions are available:")])
+    session_collection.append(session_head)
     # iterates over all available sessions
     for amount, session in enumerate(sessions):
         # gets date,start-and endtime from current session
@@ -74,10 +78,11 @@ def show_team_details(team):
         endtime = session['end_time']
 
         # creates new div with title, date, starttime, endtime and a download button
-        new_session = html.Div([
-            html.H5(f'Session: {amount}'),
-            html.P(
-                f'Datum: {date}, Starttime: {starttime}, Endtime: {endtime}'),
+        new_session = html.Div(id="session_div",children=[
+            html.H4(f'Session: {amount}'),
+            html.P(f'Datum: {date}'),
+            html.P(f'Starttime: {starttime}'), 
+            html.P(f'Endtime: {endtime}'),
             html.Button('Add to Queue', id={
                         'type': 'button_load_session', 'index': amount}, n_clicks=0)
         ])
@@ -85,7 +90,7 @@ def show_team_details(team):
         session_collection.append(new_session)
 
     #Divs for downloadqueue and buttons
-    session_list = html.Div([html.Div([html.Ul(id="downqueue",children=[html.Li(i) for i in queue]),
+    session_list = html.Div(className="queue",children=[html.Div([html.Ul(id="downqueue",children=[html.Li(i) for i in queue]),
             html.Br(),
             html.Button('Download Queue', id="downloadqueue", n_clicks=0), 
             html.Button('Add All', id="addall", n_clicks=0),
