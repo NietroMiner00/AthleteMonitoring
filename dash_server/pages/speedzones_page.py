@@ -1,4 +1,5 @@
 from inspect import Parameter
+import time
 import dash as ds
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
@@ -26,26 +27,37 @@ layout = html.Div(id='zonelayout',children=[
         ],
         #value='speed',
     ),
-    html.Div(id="zone_graph",children=[])
-])
-
-@app.callback(
-    Output('zone_graph','children'),
-    Input('zone_radio','value')
-)
-def choose_zone(choosen_zone):
-    if choosen_zone == 'speed':
-            speedlayout = [html.Div([
+    html.Div(id="zone_graph",children=[
+        html.Div([
             html.H1("Speedzones:"),
             html.Label("Seperate speedzones by ',':"),
             html.Br(),
             dcc.Input(id="speedzone-input", value="0,5,15,20,30"),
-            dcc.Graph(
-                id='speedzones-graph',
-                config= {'displayModeBar': False, 'scrollZoom': False, },
-                #layout = go.Layout(template='plotly_dark')
-            ),
-            html.Button('Generate', id='gen_speedzones', n_clicks=0)])]
+            dcc.Loading(
+                id="loading-1",
+                type="default",
+                children=[
+                    dcc.Graph(
+                        id='speedzones-graph',
+                        config= {'displayModeBar': False},
+                        #layout = go.Layout(template='plotly_dark')
+                    )
+                ]
+            )
+        ])
+    ]),
+    dcc.Store(
+        id="visible-players",
+        data=[]
+    )
+])
+
+
+def choose_zone(choosen_zone):
+    if choosen_zone == 'speed':
+            speedlayout = [
+                
+            ]
             return speedlayout
     if choosen_zone == 'heartrate':
             heartlayout = [html.Div([
@@ -55,10 +67,9 @@ def choose_zone(choosen_zone):
             dcc.Input(id="heartratezone-input", value="0,5,15,20,30"),
             dcc.Graph(
                 id='heartratezones-graph',
-                config= {'displayModeBar': False, 'scrollZoom': False, },
+                config= {'displayModeBar': False},
                 #layout = go.Layout(template='plotly_dark')
-            ),
-            html.Button('Generate', id='gen_heartratezones', n_clicks=0)])]
+            )])]
             return heartlayout
     else:
         raise PreventUpdate
@@ -81,10 +92,14 @@ def update_heartratezone_figure(n_clicks, heartzone_input):
 
 @ app.callback(
     Output("speedzones-graph", "figure"),
-    Input("gen_speedzones", "n_clicks"),
-    State("speedzone-input", "value"))
-def update_speedzone_figure(n_clicks, speedzone_input):
+    Output('visible-players', 'data'),
+    Input("zone_radio", "value"),
+    Input('example-graph', 'restyleData'),
+    State("speedzone-input", "value"),
+    State('visible-players', 'data'))
+def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_players):
     df = am.df
+    print("draw speedzones")
 
     zones = []
     temp_speedzones = speedzone_input.split(',')
@@ -116,31 +131,61 @@ def update_speedzone_figure(n_clicks, speedzone_input):
 
     speedzones_df = pd.DataFrame([speedzone.array for speedzone in speedzones], columns=speedzones[0].index.array)
 
+    print(speed_graph)
+
+    for i in range(len(visible_players), len(speedzones[0].index.array)):
+        visible_players.append(True)
+
+    # detect visible players in 'example-graph'
+    if speed_graph is not None:
+        edits, indices = speed_graph
+        try:
+            for visible, index in zip(edits["visible"], indices):
+                # visible could be the string "legend_only" which is truthy
+                # hence explicit comparison to True here
+                is_visibale = visible != 'legend_only' and visible is True
+                
+                visible_players[index] = is_visibale
+        except KeyError:
+            pass
+
+    print(visible_players)
+
+    players = speedzones[0].index.array[visible_players]
+
+    print(players)
+    print(int(len(players)/3))
+
     fig = px.bar(speedzones_df)
 
-    fig = make_subplots(rows=2)
+    fig = make_subplots(rows=int(np.ceil(len(players)/3)), cols=3, subplot_titles=players)
 
-    fig.add_trace(go.Bar(x=speedzones_df['BO5e35el'], y=speedzones_df.index + 1, marker_color=speedzones_df.index, orientation="h"), row=1, col=1)
+    for index, player in enumerate(players):
+        print((index) % 3 + 1, int(np.ceil((index+1)/3)))
+        fig.add_trace(go.Bar(x=speedzones_df[player], y=speedzones_df.index + 1, marker_color=speedzones_df.index, orientation="h"), row=int(np.ceil((index+1)/3)), col=(index) % 3 + 1)
+
+    fig.update_xaxes(
+        showgrid=False,
+        showline=False,
+        showticklabels=False,
+        fixedrange = True
+    )
+
+    fig.update_yaxes(
+        showgrid=False,
+        showline=False,
+        dtick=1,
+        fixedrange = True
+    )
 
     fig.update_layout(template="plotly_dark",
-        xaxis=dict(
-            showgrid=False,
-            showline=False,
-            showticklabels=False,
-            fixedrange = True
-        ),
-        yaxis=dict(
-            showgrid=False,
-            showline=False,
-            dtick=1,
-            fixedrange = True
-        ),
         margin=dict(
             b=0,
-            t=0,
+            t=50,
             l=0,
             r=0
         ),
-        bargap=0
+        bargap=0,
+        showlegend=False
     )
-    return fig
+    return fig, visible_players

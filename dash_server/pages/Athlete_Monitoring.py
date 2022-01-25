@@ -37,9 +37,16 @@ layout = html.Div(children=[
                     html.Button('Generate', id='gen_graph', n_clicks=0)),
                 ]),
     #draws Graphs
-    dcc.Graph(
-        id='example-graph',
-        
+    dcc.Loading(
+        id="loading-1",
+        type="default",
+        children=[
+            dcc.Graph(
+                id='example-graph',
+                config= {'displayModeBar': False},
+                #layout = go.Layout(template='plotly_dark')
+            )
+        ]
     ),
     sp.layout
 ])
@@ -57,6 +64,7 @@ layout = html.Div(children=[
 def update_figure(n_clicks, current_state, href):
     global df
     df = DataFrame()
+    print("draw not speedzones")
 
     query = parse.urlparse(href).query
     parameters = parse.parse_qs(query)
