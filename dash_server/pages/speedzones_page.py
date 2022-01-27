@@ -164,8 +164,9 @@ def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_i
     players = teams[visible_players]
     fig = px.bar(speedzones_df)
 
+    # 2 columns for 2 or less selected players and 3 columns for more
     fig = make_subplots(rows=int(np.ceil(len(players)/3)),
-                        cols=3, subplot_titles=players)
+                        cols=2 if len(players) < 3 else 3, subplot_titles=players)
 
     for index, player in enumerate(players):
         fig.add_trace(go.Bar(x=speedzones_df[player], y=speedzones_df.index + 1, marker_color=speedzones_df.index,
