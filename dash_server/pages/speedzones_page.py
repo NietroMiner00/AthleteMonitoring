@@ -68,11 +68,12 @@ layout = html.Div(id='zonelayout', children=[
     Output('visible-players', 'data'),
     Input("zone_radio", "value"),
     Input('example-graph', 'restyleData'),
-
-    State("speedzone-input", "value"),
+    Input('example-graph', 'figure'),
+    Input("speedzone-input", "value"),
+    
     State('visible-players', 'data'),
     Input('relortot', 'value'))
-def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_players, relativortotal):
+def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, visible_players, relativortotal):
     df = am.df
 
     #Prevent Update is neccesary keys not in dataframe
@@ -86,6 +87,8 @@ def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_pla
     temp_speedzones = speedzone_input.split(',')
     for zone in temp_speedzones:
         zones.append(float(zone.strip()))
+
+    teams = df['playerID'].drop_duplicates().values
 
     #Check RadioItem wether speedzones or heartzones are selected
     #determins different total and variable for further processing
@@ -115,16 +118,17 @@ def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_pla
             #Total
             if(relativortotal == 'tot'):
                 #Same as relativ above but sorted count is divied by 60 to display minutes(One entry roughly equates to one second)
-                speedzones.append(
-                    df[
-                        (df[zone_type_dt] >= zones[index]) & (df[zone_type_dt] < zones[index+1])
-                    ].groupby('playerID')[zone_type_dt]
-                    .count() / 60
-                )
+                temp_df = df[
+                    (df[zone_type_dt] >= zones[index]) & (df[zone_type_dt] < zones[index+1])
+                ].groupby('playerID')[zone_type_dt].count()
+
+                temp_df = temp_df / 60
+                
+                speedzones.append(temp_df)
         #Yes
         else:
             if(relativortotal == 'rel'):
-                #Same as above but checks wether current entry is less than infinit
+                #Same as above but checks whether current entry is less than infinit
                 speedzones.append(
                     df[
                         (df[zone_type_dt] >= zones[index]) & (df[zone_type_dt] < np.inf)
@@ -134,7 +138,6 @@ def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_pla
 
             #Only works for Speedzones and not for Heartratezones god know why.....
             if(relativortotal == 'tot'):
-                print("soll so")
                 speedzones.append(
                     df[
                         (df[zone_type_dt] >= zones[index]) & (df[zone_type_dt] < np.inf)
@@ -144,9 +147,9 @@ def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_pla
 
 
     # detect visible players in 'example-graph'
-    speedzones_df = pd.DataFrame([speedzone.array for speedzone in speedzones], columns=speedzones[0].index.array)
-    print(speedzones[0].index.array)
-    for i in range(len(visible_players), len(speedzones[0].index.array)):
+    speedzones_df = pd.DataFrame([speedzone.array for speedzone in speedzones], columns=teams)
+    
+    for i in range(len(visible_players), len(teams)):
         visible_players.append(True)
 
     if speed_graph is not None:
@@ -158,7 +161,7 @@ def update_speedzone_figure(zone_type, speed_graph, speedzone_input, visible_pla
         except KeyError:
             pass
 
-    players = speedzones[0].index.array[visible_players]
+    players = teams[visible_players]
     fig = px.bar(speedzones_df)
 
     fig = make_subplots(rows=int(np.ceil(len(players)/3)),
