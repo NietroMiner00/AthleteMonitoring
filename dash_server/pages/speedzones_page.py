@@ -41,7 +41,7 @@ layout = html.Div(id='zonelayout', children=[
                 ),
             html.Label("Seperate zones by ',':"),
             html.Br(),
-            dcc.Input(id="speedzone-input", value="0,5,15,20,30"),
+            dcc.Input(id="speedzone-input", value="0,5,15,20,30", debounce=True),
             dcc.Loading(
                     id="loading-1",
                     type="default",
@@ -70,7 +70,7 @@ layout = html.Div(id='zonelayout', children=[
     Input('example-graph', 'restyleData'),
     Input('example-graph', 'figure'),
     Input("speedzone-input", "value"),
-    
+
     State('visible-players', 'data'),
     Input('relortot', 'value'))
 def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, visible_players, relativortotal):
@@ -84,9 +84,12 @@ def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_i
     
     #Get manualy entered zones
     zones = []
-    temp_speedzones = speedzone_input.split(',')
-    for zone in temp_speedzones:
-        zones.append(float(zone.strip()))
+    try:
+        temp_speedzones = speedzone_input.split(',')
+        for zone in temp_speedzones:
+            zones.append(float(zone.strip()))
+    except Exception: # Bad practice
+        raise PreventUpdate
 
     teams = df['playerID'].drop_duplicates().values
 
