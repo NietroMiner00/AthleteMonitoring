@@ -2,3 +2,4 @@ dash_server/data/
 __pycache__/
 config.yml
 .vscode/
+output/

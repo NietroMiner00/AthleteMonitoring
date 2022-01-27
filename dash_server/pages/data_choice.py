@@ -174,10 +174,13 @@ def downloadqueue_callback(n_clicks, team_id):
         ###
 
         participants_data = utils.api.get_participants_data(session_id)
+        start_time, end_time = utils.api.get_timestamps(session_id)
+        start_time = start_time.replace(':', '-')
+        end_time = end_time.replace(':', '-')
         session_path = f"data/{team_name}"
         if not os.path.exists(session_path):
             os.makedirs(session_path)
-        participants_data.to_parquet(session_path + f"/{session_id}.parquet")
+        participants_data.to_parquet(session_path + f"/{start_time} {end_time} {session_id}.parquet")
         
 
         ###

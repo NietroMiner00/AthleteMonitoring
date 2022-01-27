@@ -70,10 +70,11 @@ layout = html.Div(id='zonelayout', children=[
     Input('example-graph', 'restyleData'),
     Input('example-graph', 'figure'),
     Input("speedzone-input", "value"),
-
+    Input('relortot', 'value'),
     State('visible-players', 'data'),
-    Input('relortot', 'value'))
-def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, visible_players, relativortotal):
+    State('recording_times','data')
+)
+def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, relativortotal,visible_players, recording_times):
     df = am.df
 
     #Prevent Update is neccesary keys not in dataframe
@@ -174,7 +175,6 @@ def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_i
     for index, player in enumerate(players):
         fig.add_trace(go.Bar(x=speedzones_df[player], y=speedzones_df.index + 1, marker_color=speedzones_df.index,
                       orientation="h"), row=int(np.ceil((index+1)/3)), col=(index) % 3 + 1)
-
 
     #Update plot axes and layout for styling purposes
     fig.update_xaxes(

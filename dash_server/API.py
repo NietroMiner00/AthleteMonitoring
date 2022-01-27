@@ -110,3 +110,10 @@ class API:
         all_player_data = all_player_data.replace("NaN", np.nan)
 
         return all_player_data #return processed dataframe with all players in the session
+
+    def get_timestamps(self, session_id):
+        session = self.get_session(session_id)
+        start_time = session['start_time']
+        end_time = session['end_time']
+        return start_time, end_time
+
