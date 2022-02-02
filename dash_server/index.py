@@ -6,6 +6,8 @@ from dash.dependencies import Input, Output
 from app import app
 from pages import Athlete_Monitoring, data_choice, localdata, oauth2_callback
 
+import webbrowser
+
 app.layout= html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
@@ -25,4 +27,5 @@ def display_page(pathname):
     return dcc.Location(href='/pages/data_choice', id='page-content')
 
 if __name__=='__main__':
-    app.run_server(debug=True)
+    webbrowser.open_new_tab("http://localhost:8050")
+    app.run_server(debug=False)
