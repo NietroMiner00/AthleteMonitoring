@@ -72,12 +72,15 @@ layout = html.Div(id='zonelayout', children=[
     Input("speedzone-input", "value"),
     Input('relortot', 'value'),
     State('visible-players', 'data'),
-    State('recording_times','data')
+    State('recording_times','data'),
+    State('graphstyle', "value")
 )
-def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, relativortotal,visible_players, recording_times):
+def update_speedzone_figure(zone_type, speed_graph, speed_graph_fig, speedzone_input, relativortotal,visible_players, recording_times, graphstyle):
     df = am.df
 
     #Prevent Update is neccesary keys not in dataframe
+    if graphstyle == 'sca':
+        raise PreventUpdate
     if "speed" not in df :
         raise PreventUpdate
     if "hr" not in df:

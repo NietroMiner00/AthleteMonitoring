@@ -22,20 +22,18 @@ df = DataFrame()
 layout = html.Div(children=[
     html.H1(children='Athlete Monitoring: Example'),
     html.Div([
-                html.Div([
-                    dcc.Dropdown(
-                        id='graphstyle',
-                        options=[
-                            {'label': 'All Player Speed x Time', 'value': 'lin'},
-                            {'label': 'One Player Speed x Time + HR', 'value': 'sca'}
-                        ],
-                        value='lin'
-                    ),
-                    html.Div(id='gs_output_container'),
-                ]),
-                html.Div(
-                    html.Button('Generate', id='gen_graph', n_clicks=0)),
-                ]),
+        html.Div([
+            dcc.Dropdown(
+                id='graphstyle',
+                options=[
+                    {'label': 'All Player Speed x Time', 'value': 'lin'},
+                    {'label': 'One Player Speed x Time + HR', 'value': 'sca'}
+                ],
+                value='lin'
+            ),
+            html.Div(id='gs_output_container'),
+        ]),
+    ]),
     #draws Graphs
     dcc.Loading(
         id="loading-1",
@@ -59,15 +57,14 @@ layout = html.Div(children=[
 @ app.callback(
     Output("example-graph", "figure"),
     Output('recording_times','data'),
-    Input("gen_graph", "n_clicks"),
-    State('graphstyle', "value"),
+    Input('graphstyle', "value"),
     State("url", "href"),
     State('recording_times','data'))
 
 #returns new figure depending on current state of the dropdown value
 #n_clicks is a stand in for button clicked/ current_state is taken from the current value of the dropdown menu "graphstyle"
 #update_figure is called on buttonpress, that may be obsolet but i did not find a way to stop it from triggering on every callback yet
-def update_figure(n_clicks, current_state, href,recording_times):
+def update_figure(current_state, href, recording_times):
     global df
     df = DataFrame()
     print("draw not speedzones")
